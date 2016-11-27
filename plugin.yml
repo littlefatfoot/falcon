@@ -1,0 +1,10 @@
+name: hCore
+version: 1.0
+author: _Ug
+description: HCF Core
+main: core.Core
+commands:
+  f:
+    description: Faction command
+  a:
+    description: Admin command
