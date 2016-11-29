@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -18,6 +19,7 @@ public class User {
 	private String player;
 
 	private Kit kit;
+	private String tabName;
 
 	private Faction faction;
 
@@ -35,18 +37,36 @@ public class User {
 
 	public User(Player player) {
 		this.player = player.getName();
-		startRemovingCooldown();
 		if(player.isOp())
 			rank = Rank.ADMIN;
+		setUp(player);
 		// Load faction
 		hello();
 	}
 
 	public User(String player) {
 		this.player = player;
-		startRemovingCooldown();
+		setUp(Core.getInstance().getPlayer(player));
 		// Load faction
 		hello();
+	}
+	
+	private void setUp(Player player){
+		startRemovingCooldown();
+		updateTabName();
+	}
+	
+	private void updateTabName(){
+		if(vanish){
+			this.tabName = ChatColor.GRAY +""+ChatColor.ITALIC + player;
+		}else{
+			if(this.rank != null && !this.rank.equals(Rank.DEFAULT)){
+				this.tabName = ChatColor.getLastColors(rank.getPrefix()) +""+ player;
+			}else{
+				this.tabName = ChatColor.WHITE + player;
+			}
+		}
+		getPlayer().setPlayerListName(tabName);
 	}
 	
 	public void setFrozen(boolean frozen){
@@ -76,6 +96,7 @@ public class User {
 	
 	public void toggleVanish(){
 		vanish = !vanish;
+		this.updateTabName();
 	}
 
 	public void setKit(Kit kit) {
@@ -133,6 +154,7 @@ public class User {
 							C.SECONDARY + "Your rank has been changed to "
 									+ C.PRIMARY + rank.getPrefix()
 									+ C.SECONDARY + "!");
+		updateTabName();
 	}
 
 	public Kit getKit() {

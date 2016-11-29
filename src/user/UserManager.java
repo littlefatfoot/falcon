@@ -11,6 +11,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.EnderPearl;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
@@ -39,7 +40,7 @@ public class UserManager implements Listener {
 
 	private static String CHAT_FORMAT = "<rank> <player>&7: <message>";
 
-	private static int DEFAULT_CHAT_COOLDOWN = 3;
+	private static int DEFAULT_CHAT_COOLDOWN = 3*20;
 
 	private ArrayList<User> users = new ArrayList<User>();
 
@@ -91,7 +92,10 @@ public class UserManager implements Listener {
 	@EventHandler
 	public void onMove(PlayerMoveEvent event){
 		if(Core.getInstance().getUserManager().getUser(event.getPlayer()).isFrozen()){
-			event.setCancelled(true);
+			if(event.getTo().getX() != event.getFrom().getX() || event.getTo().getY() != event.getFrom().getY() ||
+					event.getTo().getZ() != event.getFrom().getZ()){
+				event.getPlayer().teleport(event.getFrom());
+			}
 		}
 	}
 	
@@ -197,10 +201,12 @@ public class UserManager implements Listener {
 		if(event.getPlayer().getItemInHand().getType().equals(Material.ENDER_PEARL)){
 			if(event.getAction().equals(Action.RIGHT_CLICK_BLOCK)){
 				event.setCancelled(true);
+				event.getPlayer().updateInventory();
 				return;
 			}
-			if(user.getActiveCooldowns().contains("pearl_cooldown")){
+			if(user.getActiveCooldowns().contains("enderpearl_cooldown")){
 				event.getPlayer().sendMessage(C.SECONDARY + "You are on pearl cooldown for another " + C.PRIMARY + (int)(user.getCooldown("pearl_cooldown")/20) + "s" + C.SECONDARY + "!");
+				event.getPlayer().updateInventory();
 				event.setCancelled(true);
 				return;
 			}
@@ -216,6 +222,8 @@ public class UserManager implements Listener {
 	
 	
 	private boolean shouldCancelEvent(Player player, Location location){
+		if(Core.getInstance().getUserManager().getUser(player).isFrozen())
+			return true;
 		FChunk chunk = new FChunk(location);
 		User user = Core.getInstance().getUserManager().getUser(player);
 		if(chunk.isClaimed()){
@@ -232,7 +240,6 @@ public class UserManager implements Listener {
 		if (e.getEntity() instanceof Player) {
 			Player player = (Player) e.getEntity();
 			User user = this.getUser(player);
-			user.addCooldown("pvptimer", 20*25);
 			for (String s : user.getActiveCooldowns()) {
 				if (s.startsWith("teleport_to_")) {
 					player.sendMessage(C.SECONDARY
@@ -249,7 +256,9 @@ public class UserManager implements Listener {
 	public void onChat(AsyncPlayerChatEvent event) {
 		if (!Core.getInstance().getUserManager().getUser(event.getPlayer())
 				.hasCooldown("chat_cooldown")) {
-			Core.getInstance().getUserManager().getUser(event.getPlayer())
+			if(!Core.getInstance().getChatMuted() || Core.getInstance().getUserManager().getUser(event.getPlayer()).getRank().getId() >= Rank.MODERATOR.getId()){
+			if(Core.getInstance().getUserManager().getUser(event.getPlayer()).getRank().getId() < Rank.JRMOD.getId())
+				Core.getInstance().getUserManager().getUser(event.getPlayer())
 					.addCooldown("chat_cooldown", DEFAULT_CHAT_COOLDOWN);
 			String s = CHAT_FORMAT;
 			s = ChatColor.translateAlternateColorCodes('&', s);
@@ -260,6 +269,13 @@ public class UserManager implements Listener {
 			for (Player player : Bukkit.getServer().getOnlinePlayers()) {
 				player.sendMessage(s);
 			}
+			}else{
+				
+				event.getPlayer().sendMessage(C.SECONDARY + "Your rank " + Core.getInstance().getUserManager().getUser(event.getPlayer()).getRank().getPrefix() + C.SECONDARY + " does not have permission to chat while chat is muted.");
+			}
+			event.setCancelled(true);
+		}else{
+			event.getPlayer().sendMessage(C.SECONDARY + "You must wait "+ C.ERROR_PRIMARY + (int)(DEFAULT_CHAT_COOLDOWN/20) + "s" + C.SECONDARY + " between messages.");
 			event.setCancelled(true);
 		}
 	}
@@ -271,12 +287,40 @@ public class UserManager implements Listener {
 			Player hit = (Player) event.getEntity();
 			if (this.getUser(hit).hasCooldown("archer_tag")) {
 				if (!event.isCancelled()) {
-					event.setDamage(event.getDamage() * 1.5);
+					event.setDamage(event.getDamage() * 1.8);
+				}
+			}
+		}
+	}
+	
+	@SuppressWarnings("deprecation")
+	@EventHandler
+	public void damageOtherPlayer(EntityDamageByEntityEvent event) {
+		if(event.getEntity() instanceof Player){
+			if(event.getDamager() instanceof Player){
+				event.setCancelled(!hit((Player)event.getDamager(), (Player)event.getEntity()));
+			}else if(event.getDamager() instanceof Projectile){
+				Projectile proj = (Projectile) event.getDamager();
+				if(proj.getShooter() instanceof Player){
+					event.setCancelled(!hit((Player)proj.getShooter(), (Player)event.getEntity()));
 				}
 			}
 		}
 	}
 
+	private boolean hit(Player player, Player hit){
+		User playerU = Core.getInstance().getUserManager().getUser(player);
+		User hitU = Core.getInstance().getUserManager().getUser(hit);
+		if((!playerU.hasFaction() || !hitU.hasFaction()) || !hitU.getFaction().equals(playerU.getFaction())){
+			playerU.addCooldown("pvptimer", 20*25);
+			hitU.addCooldown("pvptimer", 20*25);
+			return true;
+		}else{
+			player.sendMessage(C.SECONDARY + "You cannot harm " +C.PRIMARY + hit.getName() + C.SECONDARY + "!");
+			return false;
+		}
+	}
+	
 	@EventHandler
 	public void onDeath(PlayerDeathEvent event) {
 		event.setDeathMessage(ChatColor.YELLOW + event.getDeathMessage());

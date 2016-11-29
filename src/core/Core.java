@@ -10,6 +10,7 @@ import faction.FactionCommand;
 import faction.FactionManager;
 import user.AdminCommands;
 import user.UserManager;
+import utils.Chat.C;
 
 public class Core extends JavaPlugin {
 
@@ -17,6 +18,7 @@ public class Core extends JavaPlugin {
 
 	private String name = "FalconHCF";
 	private int kitWarmupTicks = 20 * 8;
+	private boolean chatMuted = false;
 
 	private UserManager um;
 	private KitManager km;
@@ -44,8 +46,18 @@ public class Core extends JavaPlugin {
 			}
 		}
 		return null;
+
 	}
 
+	public boolean getChatMuted(){
+		return chatMuted;
+	}
+	
+	public void toggleChatMute(){
+		chatMuted = !chatMuted;
+		Bukkit.broadcastMessage(C.SECONDARY + "Chat has been " + C.ERROR_PRIMARY + (chatMuted ? "muted" : "unmuted") + C.SECONDARY + "!");
+	}
+	
 	public String getServerName() {
 		return name;
 	}

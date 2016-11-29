@@ -1,5 +1,7 @@
 package faction;
 
+import java.util.ArrayList;
+
 import org.bukkit.Location;
 
 import core.Core;
@@ -27,14 +29,38 @@ public class FChunk {
 	}
 
 	public boolean isInChunk(Location location) {
-		double lX = location.getX();
-		double lY = location.getY();
+		double lX = location.getBlock().getLocation().getX();
+		double lZ = location.getBlock().getLocation().getZ();
 		int a = (int) (lX / 16);
-		int b = (int) (lY / 16);
+		int b = (int) (lZ / 16);
 		if (a == x && b == z) {
 			return true;
 		}
 		return false;
+	}
+	
+	public boolean isNearOtherFaction(Faction yours){
+		for(FChunk fChunk: getNearbyChunks()){
+			if(fChunk.isClaimed()){
+				if(!fChunk.whoOwns().equals(yours)){
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public ArrayList<FChunk> getNearbyChunks(){
+		ArrayList<FChunk> nearby = new ArrayList<FChunk>();
+		for(int x = -1; x <= 1; x++){
+			for(int z = -1; z <= 1; z++){
+				if(x != 0 || z != 0){
+					FChunk fc = new FChunk(this.x + x, this.z + z);
+					nearby.add(fc);
+				}
+			}
+		}
+		return nearby;
 	}
 
 	public boolean isClaimed() {

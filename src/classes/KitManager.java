@@ -18,6 +18,7 @@ public class KitManager implements Listener {
 
 	public KitManager() {
 		registerKits();
+		startKitCheck();
 	}
 	
 	private void startKitCheck(){

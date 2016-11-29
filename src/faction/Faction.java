@@ -93,10 +93,23 @@ public class Faction {
 		this.hasFHome = true;
 	}
 
+	public void unclaim(FChunk chunk){
+		for(FChunk c : land){
+			if(c.getX() == chunk.getX() && c.getZ() == chunk.getZ()){
+				land.remove(c);
+			}
+		}
+	}
+	
+	public void unclaimAll(){
+		land.clear();
+	}
+	
 	public String tryToClaim(FChunk chunk, String name, boolean alertOnSuccess) {
 		if (chunk.isClaimed()) {
 			return C.SECONDARY + "This land is already claimed.";
 		}
+		if(!chunk.isNearOtherFaction(this)){
 		if (land.size() == 0) {
 			land.add(chunk);
 			if (alertOnSuccess)
@@ -133,6 +146,9 @@ public class Faction {
 						+ C.ERROR_PRIMARY + MAX_LAND_AMOUNT + "/"
 						+ MAX_LAND_AMOUNT + C.SECONDARY + " land!";
 			}
+		}
+		}else{
+			return C.SECONDARY + "This territory is near another faction's territory. Try claiming in a more open area.";
 		}
 	}
 

@@ -482,6 +482,13 @@ public class FactionCommand implements CommandExecutor {
 					}
 					return true;
 				}
+				if(a1.equalsIgnoreCase("leader")){
+					if(arg3.length >= 2){
+						user.getFaction().mod(player, arg3[1]);
+					}else{
+						player.sendMessage(C.SECONDARY + "Invalid syntax, try " + C.ERROR_PRIMARY + "/f leader (name)" + C.SECONDARY + "!");
+					}
+				}
 				if (a1.equalsIgnoreCase("stuck")) {
 					if (user.hasFaction()) {
 						if (user.getFaction().hasFactionHome()) {
@@ -531,6 +538,47 @@ public class FactionCommand implements CommandExecutor {
 					}
 					return true;
 				}
+				if (a1.equalsIgnoreCase("unclaim")) {
+					if (user.hasFaction()) {
+						if (user.getFaction().isMod(player)) {
+							FChunk chunk = new FChunk(player.getLocation());
+							if(chunk.isClaimed() && chunk.whoOwns().equals(user.getFaction())){
+								user.getFaction().sendFactionMessage(C.PRIMARY + player.getName() + C.SECONDARY + " has unclaimed territory at " + C.PRIMARY + "(" + chunk.getX() + ", " + chunk.getZ() + ")" + C.SECONDARY + "!");
+								user.getFaction().unclaim(chunk);
+							}
+						} else {
+							player.sendMessage(C.SECONDARY
+									+ "Only the faction " + C.ERROR_PRIMARY
+									+ "Moderators" + C.SECONDARY
+									+ " can promote users.");
+						}
+					} else {
+						player.sendMessage(C.SECONDARY
+								+ "You are not in a faction.");
+					}
+					return true;
+				}
+				
+				if (a1.equalsIgnoreCase("unclaimall")) {
+					if (user.hasFaction()) {
+						if (user.getFaction().isMod(player)) {
+							FChunk chunk = new FChunk(player.getLocation());
+							if(chunk.isClaimed() && chunk.whoOwns().equals(user.getFaction())){
+								user.getFaction().sendFactionMessage(C.PRIMARY + player.getName() + C.SECONDARY + " has unclaimed all faction territory!");
+								user.getFaction().unclaimAll();
+							}
+						} else {
+							player.sendMessage(C.SECONDARY
+									+ "Only the faction " + C.ERROR_PRIMARY
+									+ "Moderators" + C.SECONDARY
+									+ " can promote users.");
+						}
+					} else {
+						player.sendMessage(C.SECONDARY
+								+ "You are not in a faction.");
+					}
+					return true;
+				}
 				if (a1.equalsIgnoreCase("disband")) {
 					if (user.hasFaction()) {
 						if (user.getFaction().getOwnerUUID()
@@ -548,6 +596,10 @@ public class FactionCommand implements CommandExecutor {
 					}
 					return true;
 				}
+				String s = "";
+				for(int i = 0; i < arg3.length; i++)
+					s+=arg3[i] + " ";
+				player.sendMessage(C.SECONDARY + "The command " + C.ERROR_PRIMARY  + "/f " + s + C.SECONDARY + "not found.");
 			}
 		} else {
 			arg0.sendMessage("This command is for players.");
@@ -594,6 +646,8 @@ public class FactionCommand implements CommandExecutor {
 				+ "- Shows faction information and members.");
 		player.sendMessage(C.PRIMARY + "/f create (name) " + C.SECONDARY
 				+ "- Create a faction.");
+		player.sendMessage(C.PRIMARY + "/f join (name) " + C.SECONDARY
+				+ "- Join a faction.");
 		player.sendMessage(needFaction + "/f home " + C.SECONDARY
 				+ "- Teleport to faction home.");
 		player.sendMessage(needFaction + "/f leave " + C.SECONDARY
@@ -604,10 +658,16 @@ public class FactionCommand implements CommandExecutor {
 				+ "- Claim a chunk of land for your faction.");
 		player.sendMessage(needMod + "/f sethome " + C.SECONDARY
 				+ "- Set the home of your faction.");
+		player.sendMessage(needMod + "/f unclaim " + C.SECONDARY
+				+ "- Unclaim some faction land.");
+		player.sendMessage(needMod + "/f unclaimall " + C.SECONDARY
+				+ "- Unclaim all faction land.");
 		player.sendMessage(needOwner + "/f mod (player) " + C.SECONDARY
 				+ "- Promote a faction member to moderator.");
 		player.sendMessage(needOwner + "/f leader (player) " + C.SECONDARY
 				+ "- Promote a faction member to owner.");
+		player.sendMessage(needOwner + "/f disband " + C.SECONDARY
+				+ "- Disband your faction.");
 	}
 
 }

@@ -14,6 +14,7 @@ import core.Core;
 
 public class AdminCommands implements CommandExecutor {
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public boolean onCommand(CommandSender arg0, Command arg1, String arg2, String[] arg3) {
 		
@@ -26,9 +27,10 @@ public class AdminCommands implements CommandExecutor {
 						player.sendMessage(C.PRIMARY +""+ChatColor.UNDERLINE+ "Admin commands:");
 						player.sendMessage("");
 						player.sendMessage(C.PRIMARY + "/a setrank (name) (rank)" + C.SECONDARY + " - Set the rank of a player.");
-						player.sendMessage(C.PRIMARY + "/a freeze (name)" + C.SECONDARY + "- Freeze a player.");
-						player.sendMessage(C.PRIMARY + "/a vanish" + C.SECONDARY + "- Freeze a player.");
-						player.sendMessage(C.PRIMARY + "/a rtp" + C.SECONDARY + "- Teleport to a random player.");
+						player.sendMessage(C.PRIMARY + "/a togglefreeze (name)" + C.SECONDARY + " - Freeze a player.");
+						player.sendMessage(C.PRIMARY + "/a vanish" + C.SECONDARY + " - Freeze a player.");
+						player.sendMessage(C.PRIMARY + "/a rtp" + C.SECONDARY + " - Teleport to a random player.");
+						player.sendMessage(C.PRIMARY + "/a mutechat" + C.SECONDARY + " - Mute server chat.");
 					}else{
 						if(arg3[0].equalsIgnoreCase("setrank")){
 							if(arg3.length >= 3){
@@ -45,6 +47,10 @@ public class AdminCommands implements CommandExecutor {
 							}else{
 								player.sendMessage(C.SECONDARY + "Invalid syntax, try " + C.ERROR_PRIMARY + "/a setrank (name) (rank)" + C.SECONDARY + "!");
 							}
+							return true;
+						}
+						if(arg3[0].equalsIgnoreCase("mutechat")){
+							Core.getInstance().toggleChatMute();
 							return true;
 						}
 						
