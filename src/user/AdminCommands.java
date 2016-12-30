@@ -11,6 +11,7 @@ import org.bukkit.entity.Player;
 
 import utils.Chat.C;
 import core.Core;
+import faction.Faction;
 
 public class AdminCommands implements CommandExecutor {
 
@@ -27,9 +28,11 @@ public class AdminCommands implements CommandExecutor {
 						player.sendMessage(C.PRIMARY +""+ChatColor.UNDERLINE+ "Admin commands:");
 						player.sendMessage("");
 						player.sendMessage(C.PRIMARY + "/a setrank (name) (rank)" + C.SECONDARY + " - Set the rank of a player.");
-						player.sendMessage(C.PRIMARY + "/a togglefreeze (name)" + C.SECONDARY + " - Freeze a player.");
+						player.sendMessage(C.PRIMARY + "/a freeze (name)" + C.SECONDARY + " - Freeze a player.");
 						player.sendMessage(C.PRIMARY + "/a vanish" + C.SECONDARY + " - Freeze a player.");
 						player.sendMessage(C.PRIMARY + "/a rtp" + C.SECONDARY + " - Teleport to a random player.");
+						player.sendMessage(C.PRIMARY + "/a dtrfreeze (faction)" + C.SECONDARY + " - Freeze faction DTR.");
+						player.sendMessage(C.PRIMARY + "/a setdtr (faction) (amount)" + C.SECONDARY + " - Set faction DTR.");
 						player.sendMessage(C.PRIMARY + "/a mutechat" + C.SECONDARY + " - Mute server chat.");
 					}else{
 						if(arg3[0].equalsIgnoreCase("setrank")){
@@ -80,7 +83,42 @@ public class AdminCommands implements CommandExecutor {
 							return true;
 						}
 						
-						if(arg3[0].equalsIgnoreCase("togglefreeze")){
+						if(arg3[0].equalsIgnoreCase("setdtr")){
+							if(arg3.length >= 3){
+								if(Core.getInstance().getFactionManager().isFaction(arg3[1])){
+									Faction faction = Core.getInstance().getFactionManager().getFaction(arg3[1]);
+									try{
+										double d = Double.parseDouble(arg3[2]);
+										faction.setDtr(d);
+										faction.sendFactionMessage(C.SECONDARY + "Your faction DTR was set to " + C.PRIMARY + faction.getDtr() + C.SECONDARY + " by " + C.PRIMARY + player.getName() + C.SECONDARY + "!");
+									}catch(Exception ex){
+										player.sendMessage(C.SECONDARY + "Invalid number given.");
+									}
+								}else{
+									player.sendMessage(C.SECONDARY + "No faction found called \"" + C.ERROR_PRIMARY + arg3[1] + "\"" + C.SECONDARY + "!");
+								}
+							}else{
+								player.sendMessage(C.SECONDARY + "Invalid syntax, try " + C.ERROR_PRIMARY + "/a setdtr (faction) (amount)" + C.SECONDARY + "!");
+							}
+							return true;
+						}
+						
+						if(arg3[0].equalsIgnoreCase("dtrfreeze")){
+							if(arg3.length >= 2){
+								if(Core.getInstance().getFactionManager().isFaction(arg3[1])){
+									Faction faction = Core.getInstance().getFactionManager().getFaction(arg3[1]);
+									faction.setFrozen(!faction.isFrozen());
+									faction.sendFactionMessage(C.SECONDARY + "Your faction DTR was " + (faction.isFrozen() ? "":"un") + "frozen by " + C.PRIMARY + player.getName() + C.SECONDARY + "!");
+								}else{
+									player.sendMessage(C.SECONDARY + "No faction found called \"" + C.ERROR_PRIMARY + arg3[1] + "\"" + C.SECONDARY + "!");
+								}
+							}else{
+								player.sendMessage(C.SECONDARY + "Invalid syntax, try " + C.ERROR_PRIMARY + "/a dtrfreeze (faction)" + C.SECONDARY + "!");
+							}
+							return true;
+						}
+						
+						if(arg3[0].equalsIgnoreCase("freeze")){
 							if(arg3.length >= 2){
 								String name = arg3[1];
 								if(Core.getInstance().isOnline(name)){

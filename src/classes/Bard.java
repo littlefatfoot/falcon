@@ -124,6 +124,7 @@ public class Bard extends Kit implements Listener {
 						if (!player.equals(user.getPlayer())) {
 							if (player.getLocation().distance(
 									user.getPlayer().getLocation()) < 8) {
+								player.removePotionEffect(type);
 								player.addPotionEffect(new PotionEffect(type,
 										20 * 5, amplifier));
 							}

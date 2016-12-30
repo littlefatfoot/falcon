@@ -8,6 +8,10 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
+import org.bukkit.scoreboard.DisplaySlot;
+import org.bukkit.scoreboard.Objective;
+import org.bukkit.scoreboard.Score;
+import org.bukkit.scoreboard.Scoreboard;
 
 import classes.Kit;
 import core.Core;
@@ -30,6 +34,8 @@ public class User {
 	private Rank rank = Rank.DEFAULT;
 	
 	private boolean frozen;
+	
+	Scoreboard sb;
 
 	private HashMap<String, Location> teleportLocations = new HashMap<String, Location>();
 
@@ -51,9 +57,44 @@ public class User {
 		hello();
 	}
 	
+//	public void updateSB(){
+//
+//        if(sb == null) {
+//            sb = Bukkit.getScoreboardManager().getNewScoreboard();
+//
+//            Objective info = sb.registerNewObjective("stats", "dummy");
+//            info.setDisplayName(C.PRIMARY + "" + ChatColor.UNDERLINE + Core.getInstance().getName());
+//            info.setDisplaySlot(DisplaySlot.SIDEBAR);
+//
+//            Score m = info.getScore(ChatColor.RED + "" + ChatColor.BOLD + "HP: ");
+//            hp.setScore(15);
+//
+//            Bukkit.getPlayer(name).setScoreboard(sb);
+//        }
+//
+//        Damageable temp = Bukkit.getPlayer(name);
+//        hp.setScore(15);
+//        temp.setHealth(this.stats.get("HP"));
+//        health.getScore(name).setScore(this.stats.get("HP"));
+//        String use = String.valueOf((int) temp.getHealth());
+//        if(shield > 0){
+//            String x = ChatColor.AQUA.toString();
+//            use += x + "(" + shield + ")";
+//        }
+//        hpN = statsS.getScore(ChatColor.RED + use);
+//        hpN.setScore(14);
+//       
+//        //----------------------------------------
+//
+//        mana.setScore(13);
+//        manaN = statsS.getScore(ChatColor.BLUE + String.valueOf(this.stats.get("mana")));
+//        manaN.setScore(12);
+//	}
+	
 	private void setUp(Player player){
 		startRemovingCooldown();
 		updateTabName();
+//		this.updateSB();
 	}
 	
 	private void updateTabName(){

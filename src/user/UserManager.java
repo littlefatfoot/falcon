@@ -205,7 +205,7 @@ public class UserManager implements Listener {
 				return;
 			}
 			if(user.getActiveCooldowns().contains("enderpearl_cooldown")){
-				event.getPlayer().sendMessage(C.SECONDARY + "You are on pearl cooldown for another " + C.PRIMARY + (int)(user.getCooldown("pearl_cooldown")/20) + "s" + C.SECONDARY + "!");
+				event.getPlayer().sendMessage(C.SECONDARY + "You are on pearl cooldown for another " + C.PRIMARY + (int)(user.getCooldown("enderpearl_cooldown")/20) + "s" + C.SECONDARY + "!");
 				event.getPlayer().updateInventory();
 				event.setCancelled(true);
 				return;
@@ -323,9 +323,11 @@ public class UserManager implements Listener {
 	
 	@EventHandler
 	public void onDeath(PlayerDeathEvent event) {
+		if(event.getEntity().getKiller() != null)
 		event.setDeathMessage(ChatColor.YELLOW + event.getDeathMessage());
 		
 		Player player = event.getEntity();
+		player.getInventory().clear();
 		if (Core.getInstance().getUserManager().getUser(player).hasFaction()) {
 			Core.getInstance().getUserManager().getUser(player).getFaction()
 					.factionDeath();

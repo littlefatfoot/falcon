@@ -43,6 +43,8 @@ public class Faction {
 	private boolean frozen = true;
 
 	private int timeToReset = TIME_TO_RESET_SECONDS;
+	
+	private boolean warzone = false, spawn = false;
 
 	public Faction(String name, String owner, String ownerUUID, int dtr,
 			Location fHome, boolean hasFHome) {
@@ -61,6 +63,14 @@ public class Faction {
 		}
 	}
 
+	public void setWarzone(){
+		this.warzone = true;
+	}
+	
+	public void setSpawn(){
+		this.spawn = true;
+	}
+	
 	public ArrayList<FChunk> getLand() {
 		return land;
 	}
@@ -88,17 +98,29 @@ public class Faction {
 		return MAX_LAND_AMOUNT;
 	}
 
+	public boolean isWarzone(){
+		return this.warzone;
+	}
+	
+	public boolean isSpawn(){
+		return this.spawn;
+	}
+	
 	public void setFactionHome(Location location) {
 		this.fHome = location;
 		this.hasFHome = true;
 	}
 
 	public void unclaim(FChunk chunk){
+		FChunk fc = null;
 		for(FChunk c : land){
 			if(c.getX() == chunk.getX() && c.getZ() == chunk.getZ()){
-				land.remove(c);
+				fc = c;
+				break;
 			}
 		}
+		if(fc != null)
+			this.land.remove(fc);
 	}
 	
 	public void unclaimAll(){
@@ -277,8 +299,12 @@ public class Faction {
 		return dtr;
 	}
 
-	public void setDtr(int amount) {
-		dtr = amount;
+	public void setDtr(double d) {
+		dtr = d;
+		if(dtr > this.maxDtr)
+			dtr = this.maxDtr;
+		if(dtr < this.maxDtr)
+			this.setFrozen(false);
 	}
 
 	public boolean isRaidable() {
@@ -327,7 +353,7 @@ public class Faction {
 	}
 
 	public void owner(Player sender, String player) {
-		if (!owner.equals(sender.getUniqueId().toString())) {
+		if (!ownerUUID.equals(sender.getUniqueId().toString())) {
 			sender.sendMessage(C.SECONDARY + "You must be faction rank "
 					+ C.ERROR_PRIMARY + "Leader" + C.SECONDARY
 					+ " to promote users.");

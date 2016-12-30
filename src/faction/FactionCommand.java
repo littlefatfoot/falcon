@@ -109,13 +109,31 @@ public class FactionCommand implements CommandExecutor {
 						String s = "";
 						for (int y = -10; y <= 10; y++) {
 							Location location = player.getLocation();
-							location.setX(location.getX() + (i * 16));
-							location.setZ(location.getZ() + (y * 16));
+							location.setX(location.getX() + (y * 16));
+							location.setZ(location.getZ() + (i * 16));
 							FChunk chunk = new FChunk(location);
 							FChunk current = new FChunk(player.getLocation());
 							if(y <= -8 && i <= -3){
-								s+= " ";
+								if(i == -5 && y == -10)
+									s += "\\";
+								if(i == -5 && y == -9)
+									s += "N";
+								if(i == -5 && y == -8)
+									s += "/";
+								if(i == -4 && y == -10)
+									s += "W";
+								if(i == -4 && y == -9)
+									s += "x";
+								if(i == -4 && y == -8)
+									s += "/";
+								if(i == -3 && y == -10)
+									s += "/";
+								if(i == -3 && y == -9)
+									s += "S";
+								if(i == -3 && y == -8)
+									s += "\\";
 							}else{
+						
 							if (!(chunk.getX() == current.getX() && chunk
 									.getZ() == current.getZ())) {
 
@@ -178,12 +196,13 @@ public class FactionCommand implements CommandExecutor {
 								+ factions.get(faction) + ", ";
 					}
 					String f = "";
-					for (int i = 0; i < m.length() - 2; i++) {
-						f += m.charAt(i);
+					for (int q = 0; q < m.length() - 2; q++) {
+						f += m.charAt(q);
 					}
 					if(!"".equals(f))
 						f = f + ".";
 					player.sendMessage(f);
+					return true;
 				}
 				if (a1.equalsIgnoreCase("join")) {
 					if (!user.hasFaction()) {
@@ -218,6 +237,7 @@ public class FactionCommand implements CommandExecutor {
 						player.sendMessage(C.SECONDARY
 								+ "You are already in a faction.");
 					}
+					return true;
 				}
 				if (a1.equalsIgnoreCase("kick")) {
 					if (user.hasFaction()) {
@@ -279,6 +299,7 @@ public class FactionCommand implements CommandExecutor {
 						player.sendMessage(C.SECONDARY
 								+ "You are not in a faction.");
 					}
+					return true;
 				}
 				if (a1.equalsIgnoreCase("mod")) {
 					if (user.hasFaction()) {
@@ -317,6 +338,7 @@ public class FactionCommand implements CommandExecutor {
 						player.sendMessage(C.SECONDARY
 								+ "You are not in a faction.");
 					}
+					return true;
 				}
 				if (a1.equalsIgnoreCase("inv") || a1.equalsIgnoreCase("invite")) {
 					if (user.hasFaction()) {
@@ -376,6 +398,7 @@ public class FactionCommand implements CommandExecutor {
 						player.sendMessage(C.SECONDARY
 								+ "You are not in a faction.");
 					}
+					return true;
 				}
 				if (a1.equalsIgnoreCase("claim")) {
 					if (user.hasFaction()) {
@@ -484,10 +507,11 @@ public class FactionCommand implements CommandExecutor {
 				}
 				if(a1.equalsIgnoreCase("leader")){
 					if(arg3.length >= 2){
-						user.getFaction().mod(player, arg3[1]);
+						user.getFaction().owner(player, arg3[1]);
 					}else{
 						player.sendMessage(C.SECONDARY + "Invalid syntax, try " + C.ERROR_PRIMARY + "/f leader (name)" + C.SECONDARY + "!");
 					}
+					return true;
 				}
 				if (a1.equalsIgnoreCase("stuck")) {
 					if (user.hasFaction()) {
@@ -605,7 +629,7 @@ public class FactionCommand implements CommandExecutor {
 			arg0.sendMessage("This command is for players.");
 		}
 
-		return false;
+		return true;
 	}
 
 	private void displayFactionWho(Player player, Faction faction) {

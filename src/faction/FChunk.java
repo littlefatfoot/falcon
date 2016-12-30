@@ -9,15 +9,21 @@ import core.Core;
 public class FChunk {
 
 	private int x, z;
+	
+	private boolean nX = false, nZ = false;
 
 	public FChunk(int x, int z) {
 		this.x = x;
 		this.z = z;
+		this.nX = x < 0;
+		this.nZ = z < 0;
 	}
 
 	public FChunk(Location location) {
 		this.x = (int) (location.getX() / 16);
 		this.z = (int) (location.getZ() / 16);
+		this.nX = location.getX() < 0;
+		this.nZ = location.getZ() < 0;
 	}
 
 	public int getX() {
@@ -33,7 +39,7 @@ public class FChunk {
 		double lZ = location.getBlock().getLocation().getZ();
 		int a = (int) (lX / 16);
 		int b = (int) (lZ / 16);
-		if (a == x && b == z) {
+		if (a == x && b == z && lX < 0 == nX && lZ < 0 == nZ) {
 			return true;
 		}
 		return false;

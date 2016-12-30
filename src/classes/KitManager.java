@@ -44,7 +44,7 @@ public class KitManager implements Listener {
 				}
 			}
 			
-		}, 40, 40);
+		}, 5, 5);
 	}
 
 	@EventHandler
@@ -86,6 +86,8 @@ public class KitManager implements Listener {
 		kits.add(bard);
 		Archer archer = new Archer();
 		kits.add(archer);
+		Rouge rogue = new Rouge();
+		kits.add(rogue);
 
 		Bukkit.getServer().getPluginManager()
 				.registerEvents(miner, Core.getInstance());
@@ -93,6 +95,8 @@ public class KitManager implements Listener {
 				.registerEvents(bard, Core.getInstance());
 		Bukkit.getServer().getPluginManager()
 				.registerEvents(archer, Core.getInstance());
+		Bukkit.getServer().getPluginManager()
+		.registerEvents(rogue, Core.getInstance());
 	}
 
 	public Kit getKit(String name) {

@@ -39,6 +39,10 @@ public enum ArmorType {
 							Core.getInstance().getKitManager().getKit(kit)
 									.startApply(player);
 						}
+					}else{
+						if(Core.getInstance().getUserManager().getUser(player).getKit().getName().equalsIgnoreCase(kit)){
+							Core.getInstance().getUserManager().getUser(player).getKit().onApply(player);
+						}
 					}
 				}
 				return true;

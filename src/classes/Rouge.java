@@ -18,34 +18,11 @@ import user.User;
 import utils.ArmorType;
 import utils.Chat.C;
 
-public class Archer extends Kit implements Listener {
+public class Rouge extends Kit implements Listener {
 
-	public Archer() {
-		super("Archer", ArmorType.LEATHER);
+	public Rouge() {
+		super("Rouge", ArmorType.CHAIN);
 	}
-
-	@SuppressWarnings("deprecation")
-	@EventHandler
-	public void onHit(EntityDamageByEntityEvent event) {
-		if (event.getDamager() instanceof Arrow) {
-			Arrow arrow = (Arrow) event.getDamager();
-			if (arrow.getShooter() instanceof Player) {
-				Player player = (Player) arrow.getShooter();
-				if (Core.getInstance().getUserManager().getUser(player)
-						.hasKit()
-						&& Core.getInstance().getUserManager().getUser(player)
-								.getKit().equals(this)) {
-					event.setDamage(event.getDamage() * 2);
-					if (event.getEntity() instanceof Player) {
-						Player hit = (Player) event.getEntity();
-						Core.getInstance().getUserManager().getUser(hit)
-								.addCooldown("archer_tag", 20 * 10);
-					}
-				}
-			}
-		}
-	}
-	
 	@EventHandler
 	public void onInteract(PlayerInteractEvent event) {
 		if (!event.getAction().equals(Action.RIGHT_CLICK_AIR)
@@ -56,10 +33,10 @@ public class Archer extends Kit implements Listener {
 		if (user.hasKit() && user.getKit().equals(this)) {
 			Material m = user.getPlayer().getItemInHand().getType();
 			PotionEffectType type = PotionEffectType.SPEED;
-			int amplifier = 3;
-			if (m.equals(Material.SUGAR)) {
-				if(user.hasCooldown("archer_speed_cooldown")){
-					user.getPlayer().sendMessage(C.SECONDARY + "You are still on cooldown for " + C.ERROR_PRIMARY + (int)(user.getCooldown("archer_speed_cooldown")/20) + "s" + C.SECONDARY + "!");
+			int amplifier = 2;
+			if (m.equals(Material.QUARTZ)) {
+				if(user.hasCooldown("rouge_attack_cooldown")){
+					user.getPlayer().sendMessage(C.SECONDARY + "You are still on cooldown for " + C.ERROR_PRIMARY + (int)(user.getCooldown("rouge_attack_cooldown")/20) + "s" + C.SECONDARY + "!");
 					return;
 				}
 
@@ -76,9 +53,14 @@ public class Archer extends Kit implements Listener {
 					event.getPlayer().updateInventory();
 				}
 				event.getPlayer().removePotionEffect(PotionEffectType.SPEED);
+				event.getPlayer().removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
 				event.getPlayer().addPotionEffect(new PotionEffect(type,
-						20 * 8, amplifier));
-				user.addCooldown("archer_speed_cooldown", 20*30);
+						20 * 5, amplifier));
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INCREASE_DAMAGE,
+						20 * 5, 1));
+				event.getPlayer().addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY,
+						20 * 5, 1));
+				user.addCooldown("rouge_attack_cooldown", 20*55);
 				Bukkit.getServer().getScheduler().scheduleSyncDelayedTask(Core.getInstance(), new Runnable(){
 
 					@Override
@@ -86,7 +68,7 @@ public class Archer extends Kit implements Listener {
 						onApply(event.getPlayer());
 					}
 					
-				}, 20*8 + 1);
+				}, 20*5 + 1);
 			}
 		}
 	}
@@ -94,13 +76,14 @@ public class Archer extends Kit implements Listener {
 	@Override
 	public void onApply(Player player) {
 		player.addPotionEffect(new PotionEffect(PotionEffectType.SPEED,
-				Integer.MAX_VALUE, 2));
+				Integer.MAX_VALUE, 1));
 		player.addPotionEffect(new PotionEffect(
-				PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 1));
+				PotionEffectType.DAMAGE_RESISTANCE, Integer.MAX_VALUE, 0));
 	}
 
 	@Override
 	public void onRemove(Player player) {
+		player.removePotionEffect(PotionEffectType.INCREASE_DAMAGE);
 		player.removePotionEffect(PotionEffectType.DAMAGE_RESISTANCE);
 		player.removePotionEffect(PotionEffectType.SPEED);
 	}
